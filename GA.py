@@ -1,4 +1,10 @@
-import random
+import Problem
+import Crossover_op as C
+import Mutation_op as M
+import ParentSelection_op as P
+import GenerationSelection_op as G
+import Experiment as exp
+import plot
 
 class Chromossome(object):
     
@@ -7,10 +13,9 @@ class Chromossome(object):
         self.fitness = float('inf')
     
     def __eq__(self, other):
+        if other == None:
+            return False
         return self.chromossome == other.chromossome
-    
-    def __lt__(self, other):
-        return self.fitness < other.fitness
     
     def __str__(self):
         return "%s, Fitness: %s" % (str(self.chromossome), str(self.fitness))
@@ -20,164 +25,181 @@ class Chromossome(object):
     
 class GA(object):
     
-    def __init__(self, problem, crossover, mutation, parent_selection, pop_size=100, limit=10000):
+    def __init__(self, name, problem, crossover, mutation, parent_selection, generation_selection, pop_size=100, parents_n=50, limit=1000):
+        self.name = name
         self.population = []
         self.problem = problem
+        self.maximization = (self.problem.p_type == "MAX")
         self.crossover = crossover
         self.mutation = mutation
         self.parent_selection = parent_selection
+        self.generation_selection = generation_selection
+        self.generation_selection.maximization = self.maximization
         self.pop_size = pop_size
+        self.parents_n = parents_n
         self.limit = limit
         
+        self.best_solution = Chromossome([0])
+        self.best_generation_solution = Chromossome([0])
+        
+    def init(self):
+        self.best_solution = Chromossome([0])
+        self.best_generation_solution = Chromossome([0])
+    
     def init_pop(self):
-        solution_size = self.problem.solution_size
+        self.population.clear()
         for i in range(self.pop_size):
-            chromossome = [x for x in range(solution_size)]
-            random.shuffle(chromossome)
-            chrom = Chromossome(chromossome)
+            c = self.problem.random_chromossome()
+            chromossome = Chromossome(c)
             #Calculate fitness right after the chromossome is created
-            chrom.fitness = self.problem.calculate_fitness(chrom)
-            self.population.append(chrom)
+            chromossome.fitness = self.problem.calculate_fitness(chromossome.chromossome)
+            
+            self.population.append(chromossome)
+            
+    def sort_pop(self, c):
+        return c.fitness
         
     def run(self):
+        
+        self.init()
         #initialize pop
-        init_pop()
+        self.init_pop()
         
         iteration = 0
+        results = []
         while iteration < self.limit:
             #select parents
-            parents = self.parent_selection.select_parents(self.population)
+            parents = self.parent_selection.select_parents(self.population, self.parents_n, self.problem.best)
             #crossover and mutations
             children = self.crossover.crossover(parents)
             for c in children:
-                self.mutation.mutation(c)
+                self.mutation.mutation(c, self.problem.random_gene)
                 #calculate children fitness
-                c.fitness = self.problem.calculate_fitness(c)
-        
-            #select new generation
-            #TODO newgen_op
-            #select_newgen(population, children)
-            #check stop conditions
-#            iteration += 1
-#            solution = check_solution(population)
-#            if solution is not None:
-#                print("Iteration: ",iteration)
-#                return solution
-
-def init_pop(pop_size, chromossome_size):
-    population = []
-    for i in range(pop_size):
-        chromossome = [x for x in range(chromossome_size)]
-        random.shuffle(chromossome)
-        chrom = Chromossome(chromossome)
-        population.append(chrom)
-    return population
-
-def calculate_fitness(population):
-    for individual in population:
-        chrom = individual.chromossome
-        hits_count = 0
-        for i in range(len(chrom)):
-            # [collum, left_diagonal, rigth_diagonal]
-            hits = [False, False, False]
-            for j in range(i+1, len(chrom)):
-                current_queen = chrom[i]
-                next_queen = chrom[j]
-                
-                if next_queen == current_queen:
-                    hits[0] = True
-                elif next_queen == current_queen - (j - i):
-                    hits[1] = True
-                elif next_queen == current_queen + (j - i):
-                    hits[2] = True
-                
-            for hit in hits:
-                if hit:
-                    hits_count += 1
-        
-        individual.fitness = hits_count
-
-def select_parents(population, sample_size):
-    parents = []
-    indices = [x for x in range(len(population))]
-    random.shuffle(indices)
-    
-    while(len(indices) >= sample_size):
-        sample = indices[0:sample_size]
-        del indices[0:sample_size]
-        
-        candidates = []
-        for i in sample:
-            candidates.append(population[i])
+                c.fitness = self.problem.calculate_fitness(c.chromossome)
             
-        candidates = sorted(candidates)
-        parents.extend(candidates[0:2])
-        
-    return parents
-
-def crossover(parents):
-    children = []
-    for i in range(0, len(parents), 2):
-        parent1 = parents[i]
-        parent2 = parents[i+1]
-        
-        parent_length = len(parent1.chromossome)
-        cross_point = random.randint(1, parent_length-1)
-        
-        child1 = Chromossome(parent1.chromossome[:cross_point] + parent2.chromossome[cross_point:])
-        child2 = Chromossome(parent2.chromossome[:cross_point] + parent1.chromossome[cross_point:])
-        
-        children.append(child1)
-        children.append(child2)
-        
-    return children
-
-def mutation(children, mutation_rate, upper_bound):
-    for child in children:
-        for i in range(len(child.chromossome)):
-            if random.random() <= mutation_rate:
-                child.chromossome[i] = random.randint(0, upper_bound)
-                
-def select_newgen(population, childs):
-    pop_size = len(population)
-    population.extend(childs)
-    population = sorted(population)
+            #select new generation
+            self.population = self.generation_selection.select_generation(self.population, children, self.pop_size)
+            
+            self.check_best()
+            results.append(self.best_generation_solution.fitness)
+            
+            #check stop condition
+            iteration += 1
+        print(self.best_generation_solution)
+        return results
     
-    return population[:pop_size]
+    def check_best(self):
+        sorted_population = sorted(self.population, key=self.sort_pop, reverse=self.maximization)
+        
+        if self.problem.best(sorted_population[0].fitness, self.best_generation_solution.fitness):
+            
+            self.best_generation_solution = sorted_population[0]
+            
+            if self.problem.best(self.best_generation_solution.fitness, self.best_solution.fitness):
+                
+                self.best_solution = self.best_generation_solution
+                
+                
 
-def check_solution(population):
-    for individual in population:
-        if individual.fitness == 0:
-            return individual
-
-def main_loop():
+if __name__ == "__main__":
+    experiments = []
+    
+    #GA
     pop_size = 100
-    chromossome_size = 8
-    upper_bound = chromossome_size - 1
+    parents_n = pop_size/2
+    limit = 300
+    
+    #problem
+    solution_size = 8
+    gene_range = (0,solution_size-1)
+    p_type = "MIN"
+    
+    #operator
     sample_size = 5
     mutation_rate = 0.1
-    limit = 10000
-    #initialize pop
-    population = init_pop(pop_size, chromossome_size)
-    #calculate pop fitness
-    calculate_fitness(population)
     
-    iteration = 0
-    while iteration < limit:
-        #select parents
-        parents = select_parents(population, sample_size)
-        #crossover and mutations
-        children = crossover(parents)
-        mutation(children, mutation_rate, upper_bound)
-        #calculate children fitness
-        calculate_fitness(children)
-        #select new generation
-        select_newgen(population, children)
-        #check stop conditions
-        iteration += 1
-        solution = check_solution(population)
-        if solution is not None:
-            print("Iteration: ",iteration)
-            return solution
-
-print(main_loop())
+    #executions
+    n = 50
+    
+    problem = Problem.QueensProblem("8Queens", solution_size, gene_range, p_type)
+    
+    point_crossover = C.OnePointCrossover()
+    uniform_crossover = C.UniformCrossover(p=0.5)
+    
+    #random_point_mutation = M.RandomPointMutation(mutation_rate)
+    resetting_mutation = M.RandomResettingMutation(mutation_rate)
+    swap_mutation = M.SwapMutation(mutation_rate)
+    
+    tournament_parent = P.ParentTournamentSelection(sample_size)
+    uniform_parent = P.ParentUniformSelection(0.2)
+    
+    elitist_selection = G.ElitistSelection()
+    robin_selection = G.RoundRobinSelection(sample_size)
+    
+    #1
+#    algs = []
+#    algs.append(GA("Variação alta", problem, uniform_crossover, resetting_mutation, uniform_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
+#    algs.append(GA("Pressão evolutiva alta", problem, point_crossover, swap_mutation, tournament_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
+#    
+#    exps = []
+#    for alg in algs: 
+#        e = exp.Experiment(alg.name)
+#        e.run(alg,n)
+#        exps.append(e)
+#    
+#    plot.plot(exps, 'Extremos')
+    
+    #2
+#    algs = []
+#    algs.append(GA("Variação alta + elitismo", problem, uniform_crossover, resetting_mutation, uniform_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
+#    algs.append(GA("Variação baixa - elitismo", problem, point_crossover, swap_mutation, tournament_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
+#    
+#    exps = []
+#    for alg in algs: 
+#        e = exp.Experiment(alg.name)
+#        e.run(alg,n)
+#        exps.append(e)
+#    
+#    plot.plot(exps, 'elitismo')
+    
+    #3
+#    algs = []
+#    algs.append(GA("Variação alta - Point Crossover", problem, point_crossover, resetting_mutation, uniform_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
+#    algs.append(GA("Pressão evolutiva alta - Resetting Mutation", problem, point_crossover, resetting_mutation, tournament_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
+#    
+#    exps = []
+#    for alg in algs: 
+#        e = exp.Experiment(alg.name)
+#        e.run(alg,n)
+#        exps.append(e)
+#    
+#    plot.plot(exps, 'balanced')
+    
+    #4
+#    algs = []
+#    algs.append(GA("Pressão evolutiva alta", problem, point_crossover, swap_mutation, tournament_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
+#    algs.append(GA("Variação alta + elitismo", problem, uniform_crossover, resetting_mutation, uniform_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
+#    algs.append(GA("Pressão evolutiva alta - Resetting Mutation", problem, point_crossover, resetting_mutation, tournament_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
+#    
+#    exps = []
+#    for alg in algs: 
+#        e = exp.Experiment(alg.name)
+#        e.run(alg,n)
+#        exps.append(e)
+#    
+#    plot.plot(exps, '3best')
+    
+    #5
+    algs = []
+    algs.append(GA("Variação alta", problem, uniform_crossover, resetting_mutation, uniform_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
+    algs.append(GA("Variação baixa - elitismo", problem, point_crossover, swap_mutation, tournament_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
+    algs.append(GA("Variação alta - Point Crossover", problem, point_crossover, resetting_mutation, uniform_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
+    
+    exps = []
+    for alg in algs: 
+        e = exp.Experiment(alg.name)
+        e.run(alg,n)
+        exps.append(e)
+    
+    plot.plot(exps, '3worst')
+    

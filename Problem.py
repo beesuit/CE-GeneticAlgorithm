@@ -2,27 +2,31 @@ import random
 
 class Problem(object):
     
-    def __init__(self, name, solution_size, solution, gene_range):
+    def __init__(self, name, solution_size, gene_range, p_type, solution=None):
         self.name = name
         self.solution_size = solution_size
-        self.solution = solution
         self.gene_range = gene_range
-    
+        self.p_type = p_type
+        self.solution = solution
+        
     def calculate_fitness(self, c):
-        raise NotImplementedError("Method hasn't been implemented.")
+        raise NotImplementedError("The method hasn't been implemented yet.")
     
-    def check_solution(self, c):
-        raise NotImplementedError("Method hasn't been implemented.")
+    def best(self, c1, c2):
+        raise NotImplementedError("The method hasn't been implemented yet.")
         
     def random_gene(self):
-        raise NotImplementedError("Method hasn't been implemented.")
+        raise NotImplementedError("The method hasn't been implemented yet.")
+        
+    def random_chromossome(self):
+        raise NotImplementedError("The method hasn't been implemented yet.")
 
 class QueensProblem(Problem):
     
     def calculate_fitness(self, c):
-        c_size = c.size()
+        c_size = len(c)
         if c_size != self.solution_size:
-            return 0
+            return float('inf')
         
         hits_count = 0
         for i in range(c_size):
@@ -45,10 +49,21 @@ class QueensProblem(Problem):
         
         return hits_count
     
-    def check_solution(self, c):
-        if c.fitness == self.solution:
+#    def check_solution(self, c):
+#        if c.fitness == self.solution:
+#            return True
+#        return False
+        
+    def best(self, f1, f2):
+        if f1 < f2:
             return True
         return False
-    
+        
     def random_gene(self):
         return random.randint(self.gene_range[0], self.gene_range[1])
+    
+    def random_chromossome(self):
+        c = [x for x in range(self.solution_size)]
+        random.shuffle(c)
+        return c
+        
