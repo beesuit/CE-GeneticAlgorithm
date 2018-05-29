@@ -154,7 +154,7 @@ def exp1(name, function, pop_size, limit, n):
     elitist_selection = G.ElitistSelection()
     robin_selection = G.RoundRobinSelection(sample_size)
     
-    #1 wa | Elitismo
+    #1 wa | 
     title = name + '| wa_crossover | Mutation: Uniform vs Nonuniform'
     algs = []
     algs.append(GA("Uniform - Elitism", problem, wa_crossover, uf_mutation, tournament_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
@@ -164,7 +164,7 @@ def exp1(name, function, pop_size, limit, n):
 
     run(algs, n, title)
     
-    #2 a | Elitismo
+    #2 a |
     title = name + '| a_crossover | Mutation: Uniform vs Nonuniform'
     algs = []
     algs.append(GA("Uniform - Elitism", problem, a_crossover, uf_mutation, tournament_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
@@ -260,10 +260,10 @@ name = "Sphere"
 exp3(name, sphere, pop_size, limit, n)
 
 name = "Rastrigin"
-exp3(name, sphere, pop_size, limit, n)
+exp3(name, rastrigin, pop_size, limit, n)
 
 name = "Rosenbrock"
-exp3(name, sphere, pop_size, limit, n)
+exp3(name, rosenbrock, pop_size, limit, n)
 
 name = "Zakharov"
-exp3(name, sphere, pop_size, limit, n)
+exp3(name, zakharov, pop_size, limit, n)

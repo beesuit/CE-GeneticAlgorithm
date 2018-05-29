@@ -1,5 +1,4 @@
 import random
-import math
 
 class Problem(object):
     
