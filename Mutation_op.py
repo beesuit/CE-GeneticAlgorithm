@@ -5,8 +5,26 @@ class Mutation(object):
     def __init__(self, p):
         self.p = p
     
-    def mutation(self, c):
+    def mutation(self, c, gene_generator):
         raise NotImplementedError("The method hasn't been implemented yet.")
+        
+class UniformMutation(Mutation):
+    
+    def mutation(self, c, gene_generator):
+        for g in range(c.size()):
+            if random.random() < self.p:
+                c.chromossome[g] = gene_generator()
+
+class NonuniformMutation(Mutation):
+    
+    def __init__(self, p, step):
+        Mutation.__init__(self, p)
+        self.step = step
+    
+    def mutation(self, c, gene_generator):
+        for g in range(c.size()):
+            if random.random() < self.p:
+                c.chromossome[g] = c.chromossome[g] + random.gauss(0, self.step)
 
 class RandomResettingMutation(Mutation):
     

@@ -1,4 +1,5 @@
 import random
+import math
 
 class Problem(object):
     
@@ -20,6 +21,27 @@ class Problem(object):
         
     def random_chromossome(self):
         raise NotImplementedError("The method hasn't been implemented yet.")
+        
+class FunctionProblem(Problem):
+    
+    def __init__(self, name, d, interval, p_type, function, solution=None):
+        Problem.__init__(self, name, d, interval, p_type, solution)
+        self.function = function
+        
+    def calculate_fitness(self, c):
+        return self.function(c)
+    
+    def best(self, f1, f2):
+        if f1 < f2:
+            return True
+        return False
+    
+    def random_gene(self):
+        return random.uniform(self.gene_range[0], self.gene_range[1])
+    
+    def random_chromossome(self):
+        c = [self.random_gene() for x in range(self.solution_size)]
+        return c
 
 class QueensProblem(Problem):
     

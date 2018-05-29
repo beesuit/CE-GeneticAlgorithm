@@ -5,6 +5,7 @@ import ParentSelection_op as P
 import GenerationSelection_op as G
 import Experiment as exp
 import plot
+import function
 
 class Chromossome(object):
     
@@ -76,12 +77,14 @@ class GA(object):
                 self.mutation.mutation(c, self.problem.random_gene)
                 #calculate children fitness
                 c.fitness = self.problem.calculate_fitness(c.chromossome)
+                
             
             #select new generation
             self.population = self.generation_selection.select_generation(self.population, children, self.pop_size)
             
             self.check_best()
             results.append(self.best_generation_solution.fitness)
+            
             
             #check stop condition
             iteration += 1
@@ -109,19 +112,29 @@ if __name__ == "__main__":
     parents_n = pop_size/2
     limit = 300
     
-    #problem
-    solution_size = 8
-    gene_range = (0,solution_size-1)
+    #problem1
+#    solution_size = 8
+#    gene_range = (0,solution_size-1)
+#    p_type = "MIN"
+    
+    #problem2
+    solution_size = 2
+    gene_range = (-5,10)
     p_type = "MIN"
+    #function = function.sphere
+    #function = function.rastrigin
+    function = function.rosenbrock
     
     #operator
     sample_size = 5
     mutation_rate = 0.1
     
     #executions
-    n = 50
+    #n = 50
+    n=1
     
-    problem = Problem.QueensProblem("8Queens", solution_size, gene_range, p_type)
+    #problem = Problem.QueensProblem("8Queens", solution_size, gene_range, p_type)
+    problem = Problem.FunctionProblem("Sphere", solution_size, gene_range, p_type, function)
     
     point_crossover = C.OnePointCrossover()
     uniform_crossover = C.UniformCrossover(p=0.5)
