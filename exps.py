@@ -8,7 +8,8 @@ import plot
 import function as f
 from GA import GA
 
-def queens8():
+
+def pqm_opt():
     experiments = []
     
     #GA
@@ -16,17 +17,11 @@ def queens8():
     parents_n = pop_size/2
     limit = 300
     
-    #problem1
-#    solution_size = 8
-#    gene_range = (0,solution_size-1)
-#    p_type = "MIN"
-    
     #problem2
-    solution_size = 2
-    gene_range = (-5,10)
+    solution_size = 3
+    gene_range = (0,1)
     p_type = "MIN"
-    #function = function.sphere
-    #function = function.rastrigin
+    
     function = f.rosenbrock
     
     #operator

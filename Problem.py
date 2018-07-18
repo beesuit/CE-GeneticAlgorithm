@@ -21,28 +21,7 @@ class Problem(object):
     def random_chromossome(self):
         raise NotImplementedError("The method hasn't been implemented yet.")
         
-class FunctionProblem(Problem):
-    
-    def __init__(self, name, d, interval, p_type, function, solution=None):
-        Problem.__init__(self, name, d, interval, p_type, solution)
-        self.function = function
-        
-    def calculate_fitness(self, c):
-        return self.function(c)
-    
-    def best(self, f1, f2):
-        if f1 < f2:
-            return True
-        return False
-    
-    def random_gene(self):
-        return random.uniform(self.gene_range[0], self.gene_range[1])
-    
-    def random_chromossome(self):
-        c = [self.random_gene() for x in range(self.solution_size)]
-        return c
-
-class QueensProblem(Problem):
+class PqmProblem(Problem):
     
     def calculate_fitness(self, c):
         c_size = len(c)
@@ -77,14 +56,21 @@ class QueensProblem(Problem):
         
     def best(self, f1, f2):
         if f1 < f2:
+            if self.p_type == 'MIN':
+                return True
+            else:
+                return False
+        elif self.p_type == 'MAX':
             return True
-        return False
+        else:
+            return False
+        
         
     def random_gene(self):
-        return random.randint(self.gene_range[0], self.gene_range[1])
+        return random.randint(0, 1)
     
     def random_chromossome(self):
-        c = [x for x in range(self.solution_size)]
+        c = [self.random_gene() for x in range(self.solution_size)]
         random.shuffle(c)
         return c
         
