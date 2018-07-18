@@ -20,7 +20,7 @@ def pqm_opt():
     #problem2
     solution_size = 3
     gene_range = (0,1)
-    p_type = "MIN"
+    p_type = "MAX"
     
     function = f.rosenbrock
     
