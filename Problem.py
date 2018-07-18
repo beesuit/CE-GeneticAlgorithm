@@ -1,12 +1,15 @@
 import random
+import pqm
+import numpy
 
 class Problem(object):
     
-    def __init__(self, name, solution_size, gene_range, p_type, solution=None):
+    def __init__(self, name, solution_size, gene_range, p_type, pqm_type, solution=None):
         self.name = name
         self.solution_size = solution_size
         self.gene_range = gene_range
         self.p_type = p_type
+        self.pqm_type = pqm_type
         self.solution = solution
         
     def calculate_fitness(self, c):
@@ -23,31 +26,36 @@ class Problem(object):
         
 class PqmProblem(Problem):
     
+    def __init__(self, name, d, interval, p_type, X_train, X_test, y_train, y_test, solution=None):
+        Problem.__init__(self, name, d, interval, p_type, solution)
+        self.X_train = X_train
+        self.y_train = y_train
+        self.X_test = X_test
+        self.y_test = y_test
+        
+    
     def calculate_fitness(self, c):
-        c_size = len(c)
-        if c_size != self.solution_size:
-            return float('inf')
         
-        hits_count = 0
-        for i in range(c_size):
-            # [collum, left_diagonal, rigth_diagonal]
-            hits = [False, False, False]
-            for j in range(i+1, c_size):
-                current_queen = c[i]
-                next_queen = c[j]
-                
-                if next_queen == current_queen:
-                    hits[0] = True
-                elif next_queen == current_queen - (j - i):
-                    hits[1] = True
-                elif next_queen == current_queen + (j - i):
-                    hits[2] = True
-                
-            for hit in hits:
-                if hit:
-                    hits_count += 1
+        data_size = len(X_test)
+        error = [0] * data_size
+        fitness = 0
         
-        return hits_count
+        for i in range(data_size):
+            
+           result = pqm.mem_retrieval_1cbit(X_test[i], X_train, c)
+           
+           if y_test[i] == '1':
+               
+               error[i] = result - y_test[i]
+        
+            elif y_test[i] == '0':
+                
+                error[i] =  - (y_test[i] - result)
+                
+        
+        fitness = numpy.mean(error)
+        
+        return fitness
     
 #    def check_solution(self, c):
 #        if c.fitness == self.solution:
