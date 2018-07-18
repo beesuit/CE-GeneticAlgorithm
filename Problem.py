@@ -4,12 +4,12 @@ import numpy
 
 class Problem(object):
     
-    def __init__(self, name, solution_size, gene_range, p_type, pqm_type, solution=None):
+    def __init__(self, name, solution_size, gene_range, p_type, pqm_class, solution=None):
         self.name = name
         self.solution_size = solution_size
         self.gene_range = gene_range
         self.p_type = p_type
-        self.pqm_type = pqm_type
+        self.pqm_class = pqm_class
         self.solution = solution
         
     def calculate_fitness(self, c):
@@ -38,19 +38,19 @@ class PqmProblem(Problem):
         
         data_size = len(X_test)
         error = [0] * data_size
-        fitness = 0
+        fitness = float(inf)
         
         for i in range(data_size):
             
            result = pqm.mem_retrieval_1cbit(X_test[i], X_train, c)
            
-           if y_test[i] == '1':
+           if y_test[i] == self.pqm_class:
                
-               error[i] = result - y_test[i]
+               error[i] = (1 - result) ** 2
         
-            elif y_test[i] == '0':
+            elif y_test[i] != self.pqm_class:
                 
-                error[i] =  - (y_test[i] - result)
+                error[i] = (result)** 2
                 
         
         fitness = numpy.mean(error)
