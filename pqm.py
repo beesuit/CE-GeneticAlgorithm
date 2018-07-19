@@ -31,36 +31,3 @@ class PQMClassifier(PQM):
     
     def classify(self, pattern, nvalue):
         return self.memory_retrieval(pattern, nvalue)
-
-patterns = [[1,1,1], [0,1,0]]
-pqm = PQMClassifier(patterns, 'a')
-n = 1
-result = pqm.classify([0,0,0], n)
-print(result)
-
-a=0.7
-print(1/a)
-
-def best2(f1, f2, p_type):
-    if f1 < f2:
-        if p_type == 'MIN':
-            return True
-        else:
-            return False
-    elif p_type == 'MAX':
-        return True
-    else:
-        return False
-
-def best(f1, f2, p_type):
-    compare = f1 < f2
-    
-    if p_type == 'MIN':
-        return compare
-    elif p_type == 'MAX':
-        return not compare
-
-f1 = 0.5
-f2 = 0.6
-
-print(best(f1, f1, 'MIN'))
