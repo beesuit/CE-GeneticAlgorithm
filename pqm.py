@@ -1,56 +1,66 @@
 import numpy as np
-from scipy.special import binom
+import util
 
-# Computes the Hamming distance
-def hamming_distance(u, v):
-    diff_n = 0
+class PQM(object):
     
-    for value1, value2 in zip(u, v):
-        if value1 != value2:
-            diff_n += 1
+    def __init__(self, patterns):
+        self.patterns = patterns
     
-    return diff_n
-
-# Equation
-def memory_retrieval(input_pattern, patterns, control_bits_n, nvalue=1):
-    i = input_pattern
-    pi = np.pi
-    b = control_bits_n
-    p = len(patterns)
-    n = len(input_pattern)
-    
-    #Probabilities array
-    p_array = []
-    
-    #For each number of 1 bits
-    for l in range(b+1):
-        amp = binom(b, l) * (1/p)
+    def memory_retrieval(self, input_pattern, nvalue=1):
+        i = input_pattern
+        pi = np.pi
+        p = len(self.patterns)
+        n = len(input_pattern)
+        
+        amp = 1/p
+        
         sum_value = 0
         for k in range(p):
-            dh = hamming_distance(i, patterns[k])
+            dh = util.hamming_distance(i, self.patterns[k])
             v = (pi/(2*n * nvalue))*dh
             
-            #sum_value += ((np.cos(v)**(b-l))**2) * ((np.sin(v)**l)**2)
-            sum_value += (np.cos(v)**(2*b-2*l)) * (np.sin(v)**(2*l))
-            
-        p_array.append(amp * sum_value)
+            sum_value += np.cos(v)**2
     
-    return p_array
+        return amp * sum_value
+    
+class PQMClassifier(PQM):
+    
+    def __init__(self, patterns, pqm_class):
+        PQM.__init__(self, patterns)
+        self.pqm_class = pqm_class
+    
+    def classify(self, pattern, nvalue):
+        return self.memory_retrieval(pattern, nvalue)
 
-# Equation 1
-def mem_retrieval_1cbit(input_pattern, patterns, nvalue=1):
-    i = input_pattern
-    pi = np.pi
-    p = len(patterns)
-    n = len(input_pattern)
+patterns = [[1,1,1], [0,1,0]]
+pqm = PQMClassifier(patterns, 'a')
+n = 1
+result = pqm.classify([0,0,0], n)
+print(result)
+
+a=0.7
+print(1/a)
+
+def best2(f1, f2, p_type):
+    if f1 < f2:
+        if p_type == 'MIN':
+            return True
+        else:
+            return False
+    elif p_type == 'MAX':
+        return True
+    else:
+        return False
+
+def best(f1, f2, p_type):
+    compare = f1 < f2
     
-    amp = 1/p
-    
-    sum_value = 0
-    for k in range(p):
-        dh = hamming_distance(i, patterns[k])
-        v = (pi/(2*n * nvalue))*dh
-        
-        sum_value += np.cos(v)**2
-    
-    return amp * sum_value
+    if p_type == 'MIN':
+        return compare
+    elif p_type == 'MAX':
+        return not compare
+
+f1 = 0.5
+f2 = 0.6
+
+print(best(f1, f1, 'MIN'))
