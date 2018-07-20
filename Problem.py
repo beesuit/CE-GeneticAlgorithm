@@ -1,5 +1,4 @@
 import random
-import pqm
 import math
 
 class Problem(object):
@@ -35,8 +34,8 @@ class PQMProblem(Problem):
         int_part = c[0:len(c)-self.precision]
         dec_part = c[len(c)-self.precision:]
         
-        int_v = ''.join(map(str, int_part))
-        dec_v = ''.join(map(str, dec_part))
+        int_v = int(''.join(map(str, int_part)), 2)
+        dec_v = int(''.join(map(str, dec_part)), 2)
         
         value = int_v + (dec_v/10**(len(str(dec_v))))
         scale_p = value
@@ -47,13 +46,13 @@ class PQMProblem(Problem):
         
         for i in range(data_size):
             
-           result = pqm.classify(self.X_test[i], self.X_train, scale_p)
+           result = self.pqm.classify(self.X_test[i], scale_p)
            
-           if self.y_test[i] == self.pqm_class:
+           if self.y_test[i] == self.pqm.pqm_class:
                
                error += (1 - result)**2
                
-           elif self.y_test[i] != self.pqm_class:
+           elif self.y_test[i] != self.pqm.pqm_class:
                error += result**2
                 
         fitness = error/data_size
