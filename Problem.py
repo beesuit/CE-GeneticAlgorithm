@@ -1,16 +1,14 @@
 import random
 import pqm
-import numpy
+import math
 
 class Problem(object):
     
-    def __init__(self, name, solution_size, gene_range, p_type, pqm_class, solution=None):
+    def __init__(self, name, solution_size, gene_range, p_type):
         self.name = name
         self.solution_size = solution_size
         self.gene_range = gene_range
         self.p_type = p_type
-        self.pqm_class = pqm_class
-        self.solution = solution
         
     def calculate_fitness(self, c):
         raise NotImplementedError("The method hasn't been implemented yet.")
@@ -24,61 +22,56 @@ class Problem(object):
     def random_chromossome(self):
         raise NotImplementedError("The method hasn't been implemented yet.")
         
-class PqmProblem(Problem):
+class PQMProblem(Problem):
     
-    def __init__(self, name, d, interval, p_type, X_train, X_test, y_train, y_test, solution=None):
-        Problem.__init__(self, name, d, interval, p_type, solution)
-        self.X_train = X_train
-        self.y_train = y_train
+    def __init__(self, name, solution_size, precision, interval, p_type, pqm, X_test, y_test):
+        Problem.__init__(self, name, solution_size, interval, p_type)
         self.X_test = X_test
         self.y_test = y_test
-        
+        self.pqm = pqm
+        self.precision = precision
     
     def calculate_fitness(self, c):
+        int_part = c[0:len(c)-self.precision]
+        dec_part = c[len(c)-self.precision:]
         
-        data_size = len(X_test)
-        error = [0] * data_size
-        fitness = float(inf)
+        int_v = ''.join(map(str, int_part))
+        dec_v = ''.join(map(str, dec_part))
+        
+        value = int_v + (dec_v/10**(len(str(dec_v))))
+        scale_p = value
+        
+        data_size = len(self.X_test)
+        error = 0
+        fitness = float(math.inf)
         
         for i in range(data_size):
             
-           result = pqm.mem_retrieval_1cbit(X_test[i], X_train, c)
+           result = pqm.classify(self.X_test[i], self.X_train, scale_p)
            
-           if y_test[i] == self.pqm_class:
+           if self.y_test[i] == self.pqm_class:
                
-               error[i] = (1 - result) ** 2
-        
-            elif y_test[i] != self.pqm_class:
+               error += (1 - result)**2
+               
+           elif self.y_test[i] != self.pqm_class:
+               error += result**2
                 
-                error[i] = (result)** 2
-                
-        
-        fitness = numpy.mean(error)
+        fitness = error/data_size
         
         return fitness
-    
-#    def check_solution(self, c):
-#        if c.fitness == self.solution:
-#            return True
-#        return False
         
     def best(self, f1, f2):
-        if f1 < f2:
-            if self.p_type == 'MIN':
-                return True
-            else:
-                return False
+        compare = f1 < f2
+    
+        if self.p_type == 'MIN':
+            return compare
         elif self.p_type == 'MAX':
-            return True
-        else:
-            return False
-        
+            return not compare
         
     def random_gene(self):
         return random.randint(0, 1)
     
     def random_chromossome(self):
         c = [self.random_gene() for x in range(self.solution_size)]
-        random.shuffle(c)
         return c
-        
+    
