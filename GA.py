@@ -6,6 +6,7 @@ import GenerationSelection_op as G
 import Experiment as exp
 import plot
 import function
+import numpy as np
 
 class Chromossome(object):
     
@@ -75,6 +76,11 @@ class GA(object):
             children = self.crossover.crossover(parents)
             for c in children:
                 self.mutation.mutation(c, self.problem.random_gene)
+                
+                if np.count_nonzero(c) == 0:
+                    
+                    self.constraint.constraint(c)
+                    
                 #calculate children fitness
                 c.fitness = self.problem.calculate_fitness(c.chromossome)
                 
