@@ -26,7 +26,7 @@ class Chromossome(object):
     
 class GA(object):
     
-    def __init__(self, name, problem, crossover, mutation, parent_selection, generation_selection, pop_size=100, parents_n=50, limit=1000):
+    def __init__(self, name, problem, crossover, mutation, parent_selection, generation_selection, constraint=None,pop_size=100, parents_n=50, limit=1000):
         self.name = name
         self.population = []
         self.problem = problem
@@ -42,6 +42,8 @@ class GA(object):
         
         self.best_solution = Chromossome([0])
         self.best_generation_solution = Chromossome([0])
+        
+        self.constraint = constraint
         
     def init(self):
         self.best_solution = Chromossome([0])
@@ -76,8 +78,9 @@ class GA(object):
             for c in children:
                 self.mutation.mutation(c, self.problem.random_gene)
                  
-                #check constraint
-                self.constraint.constraint(c)
+                if self.constraint != None:
+                    #check constraint
+                    self.constraint.constraint(c)
                     
                 #calculate children fitness
                 c.fitness = self.problem.calculate_fitness(c.chromossome)
