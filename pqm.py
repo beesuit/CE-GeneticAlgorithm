@@ -31,3 +31,37 @@ class PQMClassifier(PQM):
     
     def classify(self, pattern, nvalue):
         return self.memory_retrieval(pattern, nvalue)
+
+if __name__ == '__main__':
+
+    patterns = [[1,1,1]]
+    patterns = [[0,1,1,1], [1,1,1,1]]
+    pqm = PQMClassifier(patterns, 'a')
+    
+    n = 1
+    result = pqm.classify([0,0,0,0], n)
+    
+    print(result)
+    print(75/1024)
+    print(int(3.2))
+    print(int(3.2))
+    
+    def decimal_input(input_value, memory_size):
+        pattern = np.binary_repr(input_value, memory_size)
+        return pattern
+    
+    def load_data(patterns, memory_size):
+        amplitudes = np.zeros([memory_size**2])
+        for value in patterns:
+            amplitudes[int(value, 2)] = 1
+        amplitudes = amplitudes / np.linalg.norm(amplitudes)
+        return amplitudes
+    
+    test = decimal_input(2, 2)
+    print(test)
+    
+    p = ['1010']
+    print(int(p[0],2))
+    
+    amp = load_data(p, 4)
+    print(amp)
