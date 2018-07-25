@@ -16,6 +16,7 @@ class Chromossome(object):
     def __eq__(self, other):
         if other == None:
             return False
+        
         return self.chromossome == other.chromossome
     
     def __str__(self):
@@ -44,6 +45,7 @@ class GA(object):
         self.best_generation_solution = Chromossome([0])
         
         self.constraint = constraint
+        self.solutions = []
         
     def init(self):
         self.best_solution = Chromossome([0])
@@ -55,7 +57,7 @@ class GA(object):
             c = self.problem.random_chromossome()
             chromossome = Chromossome(c)
             #Calculate fitness right after the chromossome is created
-            chromossome.fitness = self.problem.calculate_fitness(chromossome.chromossome)
+            chromossome.fitness = self.__fitness(chromossome)
             
             self.population.append(chromossome)
             
@@ -77,14 +79,9 @@ class GA(object):
             children = self.crossover.crossover(parents)
             for c in children:
                 self.mutation.mutation(c, self.problem.random_gene)
-                 
-                if self.constraint != None:
-                    #check constraint
-                    self.constraint.constraint(c)
-                    
-                #calculate children fitness
-                c.fitness = self.problem.calculate_fitness(c.chromossome)
                 
+                #fitness
+                c.fitness = self.__fitness(c)
             
             #select new generation
             self.population = self.generation_selection.select_generation(self.population, children, self.pop_size)
@@ -97,6 +94,20 @@ class GA(object):
             iteration += 1
         print(self.best_generation_solution)
         return results
+    
+    # Check constraint and if the solution fitness has been already calculated
+    def __fitness(self, c):
+        #check constraint
+        if self.constraint != None:
+            self.constraint.constraint(c)
+            
+        if c in self.solutions:
+            return c.fitness
+        else:
+            #calculate children fitness
+            self.solutions.append(c)
+            return self.problem.calculate_fitness(c.chromossome)
+            
     
     def check_best(self):
         sorted_population = sorted(self.population, key=self.sort_pop, reverse=self.maximization)
