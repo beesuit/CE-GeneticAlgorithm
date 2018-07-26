@@ -11,7 +11,7 @@ class Chromossome(object):
     
     def __init__(self, chromossome):
         self.chromossome = chromossome
-        self.fitness = float('inf')
+        self.fitness = -float('inf')
     
     def __eq__(self, other):
         if other == None:
@@ -73,6 +73,7 @@ class GA(object):
         iteration = 0
         results = []
         while iteration < self.limit:
+            print('iter',iteration)
             #select parents
             parents = self.parent_selection.select_parents(self.population, self.parents_n, self.problem.best)
             #crossover and mutations
