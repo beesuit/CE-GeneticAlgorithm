@@ -20,7 +20,59 @@ class Problem(object):
         
     def random_chromossome(self):
         raise NotImplementedError("The method hasn't been implemented yet.")
+
+class WLNNProblem(Problem):
+    
+    def __init__(self, name, solution_size, precision, interval, p_type, wlnn, X_test, y_test):
+        solution_size = precision*wlnn.neurons_n
+        Problem.__init__(self, name, solution_size, interval, p_type)
+        self.X_test = X_test
+        self.y_test = y_test
+        self.wlnn = wlnn
+        self.precision = precision
+    
+    def calculate_fitness(self, c):
+        params = []
         
+        for i in range(self.wlnn.neurons_n):
+            start = i*self.precision
+            end = start+self.precision
+            
+            param_b = c[start:end]
+            
+            dec_v = int(''.join(map(str, param_b)), 2)
+            param = dec_v/10**(len(str(dec_v)))
+            
+            params.append(param)
+        
+        test_size = len(self.X_test)
+        
+        hit = 0
+        for i in range(test_size):
+           result = self.wlnn.classify(self.X_test[i], params)
+           
+           if result == self.y_test[i]:
+               hit += 1
+               
+        accuracy = hit/test_size
+        
+        return accuracy
+        
+    def best(self, f1, f2):
+        compare = f1 < f2
+    
+        if self.p_type == 'MIN':
+            return compare
+        elif self.p_type == 'MAX':
+            return not compare
+        
+    def random_gene(self):
+        return random.randint(0, 1)
+    
+    def random_chromossome(self):
+        c = [self.random_gene() for x in range(self.solution_size)]
+        return c
+
 class PQMProblem(Problem):
     
     def __init__(self, name, solution_size, precision, interval, p_type, pqm, X_test, y_test):
