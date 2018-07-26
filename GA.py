@@ -101,13 +101,13 @@ class GA(object):
         if self.constraint != None:
             self.constraint.constraint(c)
             
-        if c in self.solutions:
-            return c.fitness
-        else:
+        try:
+            index = self.solutions.index(c)
+            return self.solutions[index].fitness
+        except ValueError:
             #calculate children fitness
             self.solutions.append(c)
-            return self.problem.calculate_fitness(c.chromossome)
-            
+            return self.problem.calculate_fitness(c.chromossome) 
     
     def check_best(self):
         sorted_population = sorted(self.population, key=self.sort_pop, reverse=self.maximization)
