@@ -13,6 +13,9 @@ class GenerationSelection(object):
         
 class ElitistSelection(GenerationSelection):
     
+    def __init__(self, maximize):
+        GenerationSelection.__init__(self, maximize=maximize)
+    
     def select_generation(self, population, children, pop_size):
         population.extend(children)
         
@@ -20,8 +23,8 @@ class ElitistSelection(GenerationSelection):
     
 class RoundRobinSelection(GenerationSelection):
     
-    def __init__(self, sample_size):
-        GenerationSelection.__init__(self)
+    def __init__(self, sample_size, maximize):
+        GenerationSelection.__init__(self, maximize=maximize)
         self.sample_size = sample_size
     
     def select_generation(self, population, children, pop_size):

@@ -29,7 +29,8 @@ class PQM(object):
                 sum_value += (np.cos(v)**(2*b-2*l)) * (np.sin(v)**(2*l))
                 
             p_array.append(amp * sum_value)
-            
+        
+        #TODO CHECK exp value
         s = self.__expected_value(p_array)
         
         return s
@@ -57,6 +58,7 @@ class WLNN(object):
         self.neurons_n = len(self.classifiers)
     
     def classify(self, pattern, params):
+        #TODO CHECK otimization
         best_result = float('inf')
         best_class = None
         

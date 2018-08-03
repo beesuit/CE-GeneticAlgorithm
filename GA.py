@@ -83,17 +83,20 @@ class GA(object):
                 
                 #fitness
                 c.fitness = self.__fitness(c)
+                
             
             #select new generation
             self.population = self.generation_selection.select_generation(self.population, children, self.pop_size)
             
+            print('PreviousBest', self.best_solution)
             self.check_best()
+            print('CurrentBest', self.best_solution)
             results.append(self.best_generation_solution.fitness)
             
             
             #check stop condition
             iteration += 1
-        print(self.best_generation_solution)
+        print(self.best_solution)
         return results
     
     # Check constraint and if the solution fitness has been already calculated
