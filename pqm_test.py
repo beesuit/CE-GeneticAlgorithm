@@ -96,7 +96,7 @@ def pqm_exp():
     p_type = "MIN"
     
     #operator
-    sample_size = 5
+    sample_size = 2
     mutation_rate = 0.1
     
     #executions
@@ -150,7 +150,7 @@ def wlnn_exp():
     #GA
     pop_size = 200
     parents_n = pop_size/2
-    limit = 30
+    limit = 10
     
     #pqm
     solution_size = 15
@@ -164,7 +164,7 @@ def wlnn_exp():
     
     #executions
     #n = 50
-    n=1
+    n=10
     
     
     train_X, train_y = util.load_dataset('SPECT.train', 1)
@@ -203,8 +203,8 @@ def wlnn_exp():
     tournament_parent = P.ParentTournamentSelection(sample_size)
     uniform_parent = P.ParentUniformSelection(0.2)
     
-    elitist_selection = G.ElitistSelection()
-    robin_selection = G.RoundRobinSelection(sample_size)
+    elitist_selection = G.ElitistSelection(maximize=True)
+    robin_selection = G.RoundRobinSelection(sample_size, maximize=True)
     
     #constraint
     cons = Cons.Constraint_allZero()
@@ -238,6 +238,21 @@ def load_solutions(name):
     return solutions
 
 if __name__ == '__main__':
+        
+    p1_b = [0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1]
+    p2_b = [0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0]
+    
+    dec_v1 = int(''.join(map(str, p1_b)), 2)
+    param1 = dec_v1/10**(len(str(dec_v1)))
+    
+    dec_v2 = int(''.join(map(str, p2_b)), 2)
+    param2 = dec_v2/10**(len(str(dec_v2)))
+    
+    print(param1, param2)
+    
+    r = wlnn_class([0.9868677,0.97280595], [0,1], test_class=None)
+    print(r)
+    
     #pqm_exp()
     wlnn_exp()
     #os.system('shutdown -s')
