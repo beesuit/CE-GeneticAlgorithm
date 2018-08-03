@@ -11,6 +11,8 @@ import pqm
 import Constraint_op as Cons
 import math
 import pickle
+import os
+import numpy as np
 
 def pqm_class(param, train_class, test_class=None):
     train_X, train_y = util.load_dataset('SPECT.train', 1)
@@ -59,7 +61,7 @@ def wlnn_class(params, train_classes, test_class=None):
         test_y = [test_class]*len(test_X)
     
     # setup pqms and wlnn
-    c_bits = 100
+    c_bits = 1
     pqms = []
     for label in divided_samples.keys():
         #print(list(label))
@@ -76,7 +78,8 @@ def wlnn_class(params, train_classes, test_class=None):
         if result == test_y[i]:
             hits += 1
     
-    print(hits/len(test_X))
+    acc = hits/len(test_X)
+    return acc
 
 def pqm_exp():
     #experiments = []
@@ -175,7 +178,7 @@ def wlnn_exp():
         divided_samples[label].append(sample)
     
     # setup pqms and wlnn
-    c_bits = 100
+    c_bits = 1
     pqms = []
     for label in divided_samples.keys():
         #print(list(label))
@@ -237,20 +240,56 @@ def load_solutions(name):
 if __name__ == '__main__':
     #pqm_exp()
     wlnn_exp()
-    param = 0.90120
-    param2 = 0.90029
-    param3 = 0.90029515745119333168095970479165924594311356191920307568205
-    param4 = 0.90029260494972064130373071597454901043957143939591620501362517967593379524004220927650608005857953241695501154
-    paramC = 0.14336
-    #param2 =
-    #p1 = 0.21120
-    #p2 = 0.23711
-    p3 = 0.29225
-    p4 = 0.22944
-#    pqm_class(p1, 0, test_class=0)
-#    pqm_class(p2, 1, test_class=0)
-    
-    #wlnn_class([p3,p4], [0,1], test_class=None)
+    #os.system('shutdown -s')
+#    param = 0.90120
+#    param2 = 0.90029
+#    param3 = 0.90029515745119333168095970479165924594311356191920307568205
+#    param4 = 0.90029260494972064130373071597454901043957143939591620501362517967593379524004220927650608005857953241695501154
+#    paramC = 0.14336
+#    #param2 =
+#    #p1 = 0.21120
+#    #p2 = 0.23711
+#    p3 = 0.29225
+#    p4 = 0.22944
+#    #pqm_class(p3, 0, test_class=0)
+#    #pqm_class(p4, 1, test_class=0)
+#    
+#    vs = [0.87253771, 0.84823509]
+#    #vs = [0.872, 0.848]
+#    vs2 = [2.44555785, 2.40351672]
+#    vs3 = [95.10520537, 93.83000869]
+#    vs4 = [5.22369309, 5.15449209]
+#    vs5 = [p3, p4]
+#    vs6 = [0.11551, 0.6620]
+#    r = wlnn_class(vs, [0,1], test_class=None)
+#    r2 = wlnn_class(vs2, [0,1], test_class=None)
+#    r3 = wlnn_class(vs3, [0,1], test_class=None)
+#    r4 = wlnn_class(vs4, [0,1], test_class=None)
+#    r5 = wlnn_class(vs5, [0,1], test_class=None)
+#    r6 = wlnn_class(vs6, [0,1], test_class=None)
+#    print(r)
+#    print(r2)
+#    print(r3)
+#    print(r4)
+#    print(r5)
+#    print(r6)
+#    values = np.linspace(0.87253771, 1, num=20, endpoint=True)
+#    #print(values)
+#    best = {'v': None, 'perf': 0}
+#    for i in range(len(values)):
+#        for j in range(i, len(values)):
+#            v1 = values[i]
+#            v2 = values[j]
+#            print('v',v1,v2)
+#            r = wlnn_class([v1,v2], [0,1], test_class=None)
+#            print(r)
+#            
+#            if r > best['perf']:
+#                best['perf'] = r
+#                best['v'] = str(1) + ' | ' + str(v2)
+#    
+#    print(best)
+        
 #    0.23855880806830695
 #    0.23855880806830695
 #    
