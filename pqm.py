@@ -30,17 +30,7 @@ class PQM(object):
                 
             p_array.append(amp * sum_value)
         
-        #TODO CHECK exp value
-        s = self.__expected_value(p_array)
-        
-        return s
-    
-    def __expected_value(self, p_array):
-        s = 0
-        for i in range(len(p_array)):
-            s += i*p_array[i]
-        
-        return s
+        return p_array
 
 class PQMClassifier(PQM):
     
@@ -49,7 +39,18 @@ class PQMClassifier(PQM):
         self.label = label
     
     def classify(self, pattern, nvalue):
-        return self.memory_retrieval(pattern, nvalue)
+        p_array = self.memory_retrieval(pattern, nvalue)
+        
+        e = self.__expected_value(p_array)
+        
+        return e
+    
+    def __expected_value(self, p_array):
+        s = 0
+        for i in range(len(p_array)):
+            s += i*p_array[i]
+        
+        return s
 
 class WLNN(object):
     
@@ -73,16 +74,19 @@ class WLNN(object):
         
 if __name__ == '__main__':
 
-#    patterns = [[1,1,1]]
-#    patterns = [[0,1,1,1], [1,1,1,1]]
-#    pqm = PQMClassifier(patterns, 'a')
-#    pqm2 = PQMClassifier(patterns, 'b')
-#    w = WLNN(pqm, pqm2)
+    patterns1 = [[1,1,1,1], [1,1,1,1]]
+    #patterns2 = [[0,1,1,1], [1,1,1,1]]
+    pqm = PQMClassifier(patterns1, 5, 'a')
+    pqm2 = PQMClassifier(patterns1, 5, 'b')
+    w = WLNN([pqm, pqm2])
+    r = w.classify([1,1,0,1], [1,1])
     
-    train_classes = [0,1]
-    divided_samples = {str(train_class): [] for train_class in train_classes}
-    
-    print(divided_samples)
+#    print(r)
+#    
+#    train_classes = [0,1]
+#    divided_samples = {str(train_class): [] for train_class in train_classes}
+#    
+#    print(divided_samples)
 #    n = 1
 #    result = pqm.classify([0,0,0,0], n)
 #    
