@@ -11,9 +11,17 @@ class Constraint(object):
 
 class Constraint_allZero(Constraint):
     
-    def constraint(self, c):
+    def constraint(self, c, precision):
         
-        if np.count_nonzero(c) == 0:
-            point = random.randint(0, c.size()-1)
-            c.chromossome[point] = 1
+        param_n = c.size()//precision 
+        
+        for i in range(param_n):
+            
+            param = c.chromossome[i*precision:(i+1)*precision]
+        
+            if np.count_nonzero(param) == 0:
                 
+                position = random.randint(i*precision, (i+1)*precision-1)
+                
+                c.chromossome[position] = 1
+                    

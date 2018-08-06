@@ -103,7 +103,7 @@ class GA(object):
     def __fitness(self, c):
         #check constraint
         if self.constraint != None:
-            self.constraint.constraint(c)
+            self.constraint.constraint(c, self.problem.precision)
             
         try:
             index = self.solutions.index(c)
