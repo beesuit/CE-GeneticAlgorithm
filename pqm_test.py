@@ -150,7 +150,7 @@ def wlnn_exp():
     #GA
     pop_size = 200
     parents_n = pop_size/2
-    limit = 10
+    limit = 30
     
     #pqm
     solution_size = 15
@@ -159,12 +159,12 @@ def wlnn_exp():
     p_type = "MAX"
     
     #operator
-    sample_size = 5
-    mutation_rate = 0.1
+    sample_size = 2
+    mutation_rate = 0.2
     
     #executions
-    #n = 50
-    n=10
+    n = 50
+    #n=2
     
     
     train_X, train_y = util.load_dataset('SPECT.train', 1)
@@ -211,7 +211,7 @@ def wlnn_exp():
     
     #1
     algs = []
-    #algs.append(GA("Variação alta", problem, uniform_crossover, resetting_mutation, uniform_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit, constraint=cons))
+    algs.append(GA("Variação alta", problem, uniform_crossover, resetting_mutation, uniform_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit, constraint=cons))
     algs.append(GA("Pressão evolutiva alta", problem, point_crossover, swap_mutation, tournament_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit, constraint=cons))
     
     exps = []
@@ -220,18 +220,19 @@ def wlnn_exp():
         e.run(alg,n)
         exps.append(e)
     
-    name = 'solutions'
-    sols = algs[0].solutions
-    save_solutions(name, sols)
-    obj = load_solutions(name)
+    #SAVE
+    name = 'First'
+    save(name, exps)
     
-    plot.plot(exps, 'Extremos')
+    #LOAD and PLOT
+    obj = load(name)
+    plot.plot(obj, name)
     
-def save_solutions(name, solutions):
+def save(name, obj):
     with open(name+".p", "wb" ) as file:
-        pickle.dump(solutions, file)
+        pickle.dump(obj, file)
 
-def load_solutions(name):
+def load(name):
     with open(name+".p", "rb" ) as file:
         solutions = pickle.load(file)
     
