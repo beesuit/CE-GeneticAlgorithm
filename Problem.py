@@ -20,6 +20,9 @@ class Problem(object):
         
     def random_chromossome(self):
         raise NotImplementedError("The method hasn't been implemented yet.")
+    
+    def decode_solution(self, c): 
+        raise NotImplementedError("The method hasn't been implemented yet.")
 
 class WLNNProblem(Problem):
     
@@ -32,18 +35,7 @@ class WLNNProblem(Problem):
         self.precision = precision
     
     def calculate_fitness(self, c):
-        params = []
-        
-        for i in range(self.wlnn.neurons_n):
-            start = i*self.precision
-            end = start+self.precision
-            
-            param_b = c[start:end]
-            
-            dec_v = int(''.join(map(str, param_b)), 2)
-            param = dec_v/10**(len(str(dec_v)))
-            
-            params.append(param)
+        params = self.decode_solution(c)
         
         test_size = len(self.X_test)
         
@@ -72,7 +64,23 @@ class WLNNProblem(Problem):
     def random_chromossome(self):
         c = [self.random_gene() for x in range(self.solution_size)]
         return c
-
+    
+    def decode_solution(self, c): 
+        params = []
+        
+        for i in range(self.wlnn.neurons_n):
+            start = i*self.precision
+            end = start+self.precision
+            
+            param_b = c[start:end]
+            
+            dec_v = int(''.join(map(str, param_b)), 2)
+            param = dec_v/10**(len(str(dec_v)))
+            
+            params.append(param)
+        
+        return params
+            
 class PQMProblem(Problem):
     
     def __init__(self, name, solution_size, precision, interval, p_type, pqm, X_test, y_test):

@@ -41,15 +41,15 @@ class GA(object):
         self.parents_n = parents_n
         self.limit = limit
         
-        self.best_solution = Chromossome([0])
-        self.best_generation_solution = Chromossome([0])
+        self.best_solution = None
+        self.best_generation_solution = None
         
         self.constraint = constraint
         self.solutions = []
         
     def init(self):
-        self.best_solution = Chromossome([0])
-        self.best_generation_solution = Chromossome([0])
+        self.best_solution = None
+        self.best_generation_solution = None
     
     def init_pop(self):
         self.population.clear()
@@ -88,9 +88,9 @@ class GA(object):
             #select new generation
             self.population = self.generation_selection.select_generation(self.population, children, self.pop_size)
             
-            print('PreviousBest', self.best_solution)
+            print('PreviousBest', self.best_solution, self.__decode_solution(self.best_solution))
             self.check_best()
-            print('CurrentBest', self.best_solution)
+            print('CurrentBest', self.best_solution, self.__decode_solution(self.best_solution))
             results.append(self.best_generation_solution.fitness)
             
             
@@ -111,18 +111,30 @@ class GA(object):
         except ValueError:
             #calculate children fitness
             self.solutions.append(c)
-            return self.problem.calculate_fitness(c.chromossome) 
+            return self.problem.calculate_fitness(c.chromossome)
+    
+    def __decode_solution(self, solution):
+        result = None
+        if solution != None:
+            result = self.problem.decode_solution(solution.chromossome)
+        
+        return result
     
     def check_best(self):
         sorted_population = sorted(self.population, key=self.sort_pop, reverse=self.maximization)
         
-        if self.problem.best(sorted_population[0].fitness, self.best_generation_solution.fitness):
-            
+        if self.best_generation_solution == None:
             self.best_generation_solution = sorted_population[0]
-            
-            if self.problem.best(self.best_generation_solution.fitness, self.best_solution.fitness):
+            self.best_solution = self.best_generation_solution
+        
+        else:
+            if self.problem.best(sorted_population[0].fitness, self.best_generation_solution.fitness):
                 
-                self.best_solution = self.best_generation_solution
+                self.best_generation_solution = sorted_population[0]
+                
+                if self.problem.best(self.best_generation_solution.fitness, self.best_solution.fitness):
+                    
+                    self.best_solution = self.best_generation_solution
                 
                 
 
