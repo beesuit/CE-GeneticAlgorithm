@@ -228,6 +228,77 @@ def wlnn_exp():
     obj = load(name)
     plot.plot(obj, name)
     
+def nn_selection_exp(dataset, arcs):
+    #experiments = []
+    
+    #GA
+    pop_size = 200
+    parents_n = pop_size/2
+    limit = 150
+    
+    #pqm
+    solution_size = 15
+    precision = solution_size
+    gene_range = (0,1)
+    p_type = "MIN"
+    
+    #operator
+    sample_size = 2
+    mutation_rate = 0.2
+    
+    #executions
+    n = 50
+    #n=2
+    
+    # setup pqms and problem
+    file = dataset
+    hit_vectors, mean_perfs = util.get_arcs(file, arcs)
+    hit_vector_size = len(hit_vectors[0][0])
+    
+    c_bits = 1
+    pqms = []
+    for i in range(len(hit_vectors)):
+        pqms.append(pqm.PQMClassifier(hit_vectors[i], c_bits, mean_perfs[i]))
+    
+    input_pattern = [1 for i in range(hit_vector_size)]
+    
+    problem = Problem.PQMLinearApoxProblem('nnselection', solution_size, precision, gene_range, p_type, pqms, input_pattern)
+    
+    point_crossover = C.OnePointCrossover()
+    uniform_crossover = C.UniformCrossover(p=0.5)
+    
+    #random_point_mutation = M.RandomPointMutation(mutation_rate)
+    resetting_mutation = M.RandomResettingMutation(mutation_rate)
+    swap_mutation = M.SwapMutation(mutation_rate)
+    
+    tournament_parent = P.ParentTournamentSelection(sample_size)
+    uniform_parent = P.ParentUniformSelection(0.2)
+    
+    elitist_selection = G.ElitistSelection(maximize=False)
+    robin_selection = G.RoundRobinSelection(sample_size, maximize=False)
+    
+    #constraint
+    cons = Cons.Constraint_allZero()
+    
+    #1
+    algs = []
+    algs.append(GA("Variação alta", problem, uniform_crossover, resetting_mutation, uniform_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit, constraint=cons))
+    algs.append(GA("Pressão evolutiva alta", problem, point_crossover, swap_mutation, tournament_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit, constraint=cons))
+    
+    exps = []
+    for alg in algs:
+        e = exp.Experiment(alg.name)
+        e.run(alg,n)
+        exps.append(e)
+    
+    #SAVE
+    name = 'Second'
+    save(name, exps)
+    
+    #LOAD and PLOT
+    obj = load(name)
+    plot.plot(obj, name)
+    
 def save(name, obj):
     with open(name+".p", "wb" ) as file:
         pickle.dump(obj, file)
@@ -240,22 +311,25 @@ def load(name):
 
 if __name__ == '__main__':
         
-    p1_b = [0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1]
-    p2_b = [0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0]
-    
-    dec_v1 = int(''.join(map(str, p1_b)), 2)
-    param1 = dec_v1/10**(len(str(dec_v1)))
-    
-    dec_v2 = int(''.join(map(str, p2_b)), 2)
-    param2 = dec_v2/10**(len(str(dec_v2)))
-    
-    print(param1, param2)
-    
-    r = wlnn_class([0.9868677,0.97280595], [0,1], test_class=None)
-    print(r)
+#    p1_b = [0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1]
+#    p2_b = [0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0]
+#    
+#    dec_v1 = int(''.join(map(str, p1_b)), 2)
+#    param1 = dec_v1/10**(len(str(dec_v1)))
+#    
+#    dec_v2 = int(''.join(map(str, p2_b)), 2)
+#    param2 = dec_v2/10**(len(str(dec_v2)))
+#    
+#    print(param1, param2)
+#    
+#    r = wlnn_class([0.9868677,0.97280595], [0,1], test_class=None)
+#    print(r)
     
     #pqm_exp()
-    wlnn_exp()
+    #wlnn_exp()
+    dataset = 'cancer'
+    arcs = [i for i in range(1,21)]
+    nn_selection_exp(dataset, arcs)
     #os.system('shutdown -s')
 #    param = 0.90120
 #    param2 = 0.90029

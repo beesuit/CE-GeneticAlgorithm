@@ -11,7 +11,7 @@ class Chromossome(object):
     
     def __init__(self, chromossome):
         self.chromossome = chromossome
-        self.fitness = -float('inf')
+        self.fitness = float('inf')
     
     def __eq__(self, other):
         if other == None:
@@ -83,6 +83,7 @@ class GA(object):
                 
                 #fitness
                 c.fitness = self.__fitness(c)
+                #print(c)
                 
             
             #select new generation
