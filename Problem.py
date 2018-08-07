@@ -80,7 +80,62 @@ class WLNNProblem(Problem):
             params.append(param)
         
         return params
+     
+class AproxProblem(Problem):
+    
+    def __init__(self, name, solution_size, precision, interval, p_type, pqms, X_test, y_test):
+        Problem.__init__(self, name, solution_size, interval, p_type)
+        self.X_test = X_test
+        self.y_test = y_test
+        self.pqms = pqms
+        self.precision = precision
+    
+    def calculate_fitness(self, c):
+        params = self.decode_solution(c)
+        
+        sum_errors = 0
+        for i in range(len(self.pqms)):
+            result = self.pqms[i].classify(self.X_test, params[i])
             
+            result = 1 - result
+       
+            error = (self.y_test - result)**2
+            sum_errors += error
+            
+        fitness = sum_errors/len(self.pqms)
+        return fitness
+        
+    def best(self, f1, f2):
+        compare = f1 < f2
+    
+        if self.p_type == 'MIN':
+            return compare
+        elif self.p_type == 'MAX':
+            return not compare
+        
+    def random_gene(self):
+        return random.randint(0, 1)
+    
+    def random_chromossome(self):
+        c = [self.random_gene() for x in range(self.solution_size)]
+        return c
+    
+    def decode_solution(self, c): 
+        params = []
+        
+        for i in range(len(self.pqms)):
+            start = i*self.precision
+            end = start+self.precision
+            
+            param_b = c[start:end]
+            
+            dec_v = int(''.join(map(str, param_b)), 2)
+            param = dec_v/10**(len(str(dec_v)))
+            
+            params.append(param)
+        
+        return params
+       
 class PQMProblem(Problem):
     
     def __init__(self, name, solution_size, precision, interval, p_type, pqm, X_test, y_test):
