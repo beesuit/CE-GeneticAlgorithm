@@ -83,10 +83,10 @@ class WLNNProblem(Problem):
      
 class PQMLinearApoxProblem(Problem):
     
-    def __init__(self, name, solution_size, precision, interval, p_type, pqms, X_test, y_test):
+    def __init__(self, name, solution_size, precision, interval, p_type, pqms, input_pattern):
+        solution_size = precision*len(pqms)
         Problem.__init__(self, name, solution_size, interval, p_type)
-        self.X_test = X_test
-        self.y_test = y_test
+        self.input_pattern = input_pattern
         self.pqms = pqms
         self.precision = precision
     
@@ -95,11 +95,11 @@ class PQMLinearApoxProblem(Problem):
         
         sum_errors = 0
         for i in range(len(self.pqms)):
-            result = self.pqms[i].classify(self.X_test, params[i])
+            result = self.pqms[i].classify(self.input_pattern, params[i])
             
             result = 1 - result
-       
-            error = (self.y_test - result)**2
+            
+            error = (self.pqms[i].label - result)**2
             sum_errors += error
             
         fitness = sum_errors/len(self.pqms)
