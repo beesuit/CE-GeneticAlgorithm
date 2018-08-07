@@ -81,7 +81,7 @@ class WLNNProblem(Problem):
         
         return params
      
-class AproxProblem(Problem):
+class PQMLinearApoxProblem(Problem):
     
     def __init__(self, name, solution_size, precision, interval, p_type, pqms, X_test, y_test):
         Problem.__init__(self, name, solution_size, interval, p_type)
