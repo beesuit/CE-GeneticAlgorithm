@@ -10,6 +10,7 @@ class Experiment(object):
     def run(self, ga, n):
         self.results.clear()
         for i in range(n):
+            print('Execution',i)
             result = ga.run()
             self.results.append(result)
             
