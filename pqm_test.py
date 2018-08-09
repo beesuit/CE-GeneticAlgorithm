@@ -13,6 +13,7 @@ import math
 import pickle
 import os
 import numpy as np
+import gdrive
 
 def pqm_class(param, train_class, test_class=None):
     train_X, train_y = util.load_dataset('SPECT.train', 1)
@@ -228,13 +229,13 @@ def wlnn_exp():
     obj = load(name)
     plot.plot(obj, name)
     
-def nn_selection_exp(dataset, arcs):
+def nn_selection_exp(name, dataset, arcs):
     #experiments = []
     
     #GA
     pop_size = 200
     parents_n = pop_size/2
-    limit = 150
+    limit = 100
     
     #pqm
     solution_size = 15
@@ -247,7 +248,7 @@ def nn_selection_exp(dataset, arcs):
     mutation_rate = 0.2
     
     #executions
-    n = 50
+    n = 30
     #n=2
     
     # setup pqms and problem
@@ -289,10 +290,13 @@ def nn_selection_exp(dataset, arcs):
     for alg in algs:
         e = exp.Experiment(alg.name)
         e.run(alg,n)
+        #SAVE
+        save(name+alg.name, e)
+        #UPload
+        gdrive.upload(name+alg.name+'.p')
         exps.append(e)
     
-    #SAVE
-    name = 'Second'
+    #Save all exps
     save(name, exps)
     
     #LOAD and PLOT
@@ -322,14 +326,18 @@ if __name__ == '__main__':
 #    
 #    print(param1, param2)
 #    
-#    r = wlnn_class([0.9868677,0.97280595], [0,1], test_class=None)
+#    r = wlnn_class([1,1], [0,1], test_class=None)
 #    print(r)
+#    obj = load(name)
+#    param_array = [0.25375, 0.25225, 0.24508, 0.25089, 0.25177]
+#    plot.plot(obj, param_array)
     
     #pqm_exp()
     #wlnn_exp()
+    name = 'aprox_exp'
     dataset = 'cancer'
     arcs = [i for i in range(1,21)]
-    nn_selection_exp(dataset, arcs)
+    nn_selection_exp(name, dataset, arcs)
     #os.system('shutdown -s')
 #    param = 0.90120
 #    param2 = 0.90029
