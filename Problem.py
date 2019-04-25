@@ -24,6 +24,38 @@ class Problem(object):
     def decode_solution(self, c): 
         raise NotImplementedError("The method hasn't been implemented yet.")
 
+class CutProblem(Problem):
+
+    def __init__(self, name, n_windows, window_w, window_h, bar_length):
+        solution_size = 4 * n_windows
+        gene_range = (0,1)
+        p_type = 'MIN'
+        Problem.__init__(self, name, solution_size, gene_range, p_type)
+
+        self.n_windows = n_windows
+        self.window_w = window_w
+        self.window_h = window_h
+        self.bar_length = bar_length
+
+        self.representation = {0: self.window_w, 1: self.window_h}
+    
+    def calculate_fitness(self, c):
+        pass
+
+    def best(self, c1, c2):
+        pass
+    
+    def random_gene(self):
+        return random.randint(0,1)
+    
+    def random_chromossome(self):
+        c = [x%2 for x in range(self.solution_size)]
+
+        return c
+    
+    def decode_solution(self, c):
+        return [self.representation[x] for x in c]
+
 class WLNNProblem(Problem):
     
     def __init__(self, name, solution_size, precision, interval, p_type, wlnn, X_test, y_test):
