@@ -11,7 +11,7 @@ class Chromossome(object):
     
     def __init__(self, chromossome):
         self.chromossome = chromossome
-        self.fitness = -float('inf')
+        self.fitness = float('inf')
     
     def __eq__(self, other):
         if other == None:
