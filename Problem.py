@@ -43,7 +43,12 @@ class CutProblem(Problem):
         pass
 
     def best(self, c1, c2):
-        pass
+        compare = c1 < c2
+        if self.p_type == 'MIN':
+            return compare
+        elif self.p_type == 'MAX':
+            return not compare
+        
     
     def random_gene(self):
         return random.randint(0,1)
