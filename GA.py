@@ -1,17 +1,9 @@
-import Problem
-import Crossover_op as C
-import Mutation_op as M
-import ParentSelection_op as P
-import GenerationSelection_op as G
-import Experiment as exp
-import plot
-import function
-
 class Chromossome(object):
     
     def __init__(self, chromossome):
         self.chromossome = chromossome
         self.fitness = float('inf')
+        
     
     def __eq__(self, other):
         if other == None:
@@ -135,118 +127,4 @@ class GA(object):
                 if self.problem.best(self.best_generation_solution.fitness, self.best_solution.fitness):
                     
                     self.best_solution = self.best_generation_solution
-                
-                
 
-if __name__ == "__main__":
-    experiments = []
-    
-    #GA
-    pop_size = 100
-    parents_n = pop_size/2
-    limit = 300
-    
-    #problem1
-#    solution_size = 8
-#    gene_range = (0,solution_size-1)
-#    p_type = "MIN"
-    
-    #problem2
-    solution_size = 2
-    gene_range = (-5,10)
-    p_type = "MIN"
-    #function = function.sphere
-    #function = function.rastrigin
-    function = function.rosenbrock
-    
-    #operator
-    sample_size = 5
-    mutation_rate = 0.1
-    
-    #executions
-    #n = 50
-    n=1
-    
-    #problem = Problem.QueensProblem("8Queens", solution_size, gene_range, p_type)
-    problem = Problem.FunctionProblem("Sphere", solution_size, gene_range, p_type, function)
-    
-    point_crossover = C.OnePointCrossover()
-    uniform_crossover = C.UniformCrossover(p=0.5)
-    
-    #random_point_mutation = M.RandomPointMutation(mutation_rate)
-    resetting_mutation = M.RandomResettingMutation(mutation_rate)
-    swap_mutation = M.SwapMutation(mutation_rate)
-    
-    tournament_parent = P.ParentTournamentSelection(sample_size)
-    uniform_parent = P.ParentUniformSelection(0.2)
-    
-    elitist_selection = G.ElitistSelection()
-    robin_selection = G.RoundRobinSelection(sample_size)
-    
-    #1
-#    algs = []
-#    algs.append(GA("Variação alta", problem, uniform_crossover, resetting_mutation, uniform_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
-#    algs.append(GA("Pressão evolutiva alta", problem, point_crossover, swap_mutation, tournament_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
-#    
-#    exps = []
-#    for alg in algs: 
-#        e = exp.Experiment(alg.name)
-#        e.run(alg,n)
-#        exps.append(e)
-#    
-#    plot.plot(exps, 'Extremos')
-    
-    #2
-#    algs = []
-#    algs.append(GA("Variação alta + elitismo", problem, uniform_crossover, resetting_mutation, uniform_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
-#    algs.append(GA("Variação baixa - elitismo", problem, point_crossover, swap_mutation, tournament_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
-#    
-#    exps = []
-#    for alg in algs: 
-#        e = exp.Experiment(alg.name)
-#        e.run(alg,n)
-#        exps.append(e)
-#    
-#    plot.plot(exps, 'elitismo')
-    
-    #3
-#    algs = []
-#    algs.append(GA("Variação alta - Point Crossover", problem, point_crossover, resetting_mutation, uniform_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
-#    algs.append(GA("Pressão evolutiva alta - Resetting Mutation", problem, point_crossover, resetting_mutation, tournament_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
-#    
-#    exps = []
-#    for alg in algs: 
-#        e = exp.Experiment(alg.name)
-#        e.run(alg,n)
-#        exps.append(e)
-#    
-#    plot.plot(exps, 'balanced')
-    
-    #4
-#    algs = []
-#    algs.append(GA("Pressão evolutiva alta", problem, point_crossover, swap_mutation, tournament_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
-#    algs.append(GA("Variação alta + elitismo", problem, uniform_crossover, resetting_mutation, uniform_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
-#    algs.append(GA("Pressão evolutiva alta - Resetting Mutation", problem, point_crossover, resetting_mutation, tournament_parent, elitist_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
-#    
-#    exps = []
-#    for alg in algs: 
-#        e = exp.Experiment(alg.name)
-#        e.run(alg,n)
-#        exps.append(e)
-#    
-#    plot.plot(exps, '3best')
-    
-    #5
-    algs = []
-    algs.append(GA("Variação alta", problem, uniform_crossover, resetting_mutation, uniform_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
-    algs.append(GA("Variação baixa - elitismo", problem, point_crossover, swap_mutation, tournament_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
-    algs.append(GA("Variação alta - Point Crossover", problem, point_crossover, resetting_mutation, uniform_parent, robin_selection, pop_size=pop_size, parents_n=parents_n, limit=limit))
-    
-    exps = []
-    for alg in algs: 
-        e = exp.Experiment(alg.name)
-        e.run(alg,n)
-        exps.append(e)
-    
-    plot.plot(exps, '3worst')
-    
