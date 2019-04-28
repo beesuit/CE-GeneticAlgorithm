@@ -40,7 +40,28 @@ class CutProblem(Problem):
         self.representation = {0: self.window_w, 1: self.window_h}
     
     def calculate_fitness(self, c):
-        pass
+        bar_q = 1
+        bar   = self.bar_length
+        cuts  = 0
+        waste = 0.00
+
+        for g in c:
+            if(g==0):
+                if(bar < self.window_w):
+                    waste += bar
+                    bar=self.bar_length
+                    bar_q+=1
+                bar  =- self.window_w
+                cuts+=1
+
+            elif(g==1):
+                if(bar < self.window_h):
+                    waste += bar
+                    bar=self.bar_length
+                    bar_q+=1
+                bar  =- self.window_h
+                cuts+=1
+        return waste, cuts
 
     def best(self, c1, c2):
         compare = c1 < c2
@@ -48,7 +69,6 @@ class CutProblem(Problem):
             return compare
         elif self.p_type == 'MAX':
             return not compare
-        
     
     def random_gene(self):
         return random.randint(0,1)
