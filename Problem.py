@@ -72,6 +72,15 @@ class CutProblem(Problem):
     
     def random_gene(self):
         return random.randint(0,1)
+
+    def validate(self, c):
+        while(c.count(1) != (self.solution_size/2)):
+            if(c.count(1) > (self.solution_size/2)):
+                c[random.randint(0,self.solution_size)]=0
+            else:
+                c[random.randint(0,self.solution_size)]=1
+        return c            
+
     
     def random_chromossome(self):
         c = [x%2 for x in range(self.solution_size)]
