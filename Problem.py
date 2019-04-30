@@ -1,5 +1,6 @@
 import random
 import math
+import numpy as np
 
 class Problem(object):
     
@@ -21,7 +22,7 @@ class Problem(object):
     def random_chromossome(self):
         raise NotImplementedError("The method hasn't been implemented yet.")
     
-    def decode_solution(self, c): 
+    def decode_solution(self, c):
         raise NotImplementedError("The method hasn't been implemented yet.")
 
 class CutProblem(Problem):
@@ -40,28 +41,23 @@ class CutProblem(Problem):
         self.representation = {0: self.window_w, 1: self.window_h}
     
     def calculate_fitness(self, c):
-        bar_q = 1
-        bar   = self.bar_length
-        cuts  = 0
-        waste = 0.00
+        bar = self.bar_length
+        waste = 0
+
+        self.__validate_chromossome(c)
 
         for g in c:
-            if(g==0):
-                if(bar < self.window_w):
-                    waste += bar
-                    bar=self.bar_length
-                    bar_q+=1
-                bar  =- self.window_w
-                cuts+=1
+            cut_length = self.representation[g]
 
-            elif(g==1):
-                if(bar < self.window_h):
-                    waste += bar
-                    bar=self.bar_length
-                    bar_q+=1
-                bar  =- self.window_h
-                cuts+=1
-        return waste, cuts
+            if bar < cut_length:
+                waste += bar
+                bar = self.bar_length
+            
+            bar -= cut_length
+
+        waste += bar
+
+        return waste
 
     def best(self, c1, c2):
         compare = c1 < c2
@@ -73,17 +69,25 @@ class CutProblem(Problem):
     def random_gene(self):
         return random.randint(0,1)
 
-    def validate(self, c):
-        while(c.count(1) != (self.solution_size/2)):
-            if(c.count(1) > (self.solution_size/2)):
-                c[random.randint(0,self.solution_size)]=0
-            else:
-                c[random.randint(0,self.solution_size)]=1
-        return c            
+    def __validate_chromossome(self, c):
+        unique_values, counts = np.unique(c, return_counts=True)
+        balanced_count = self.solution_size/len(unique_values)
+        max_count = counts.max()
 
-    
+        if max_count > balanced_count:
+            #raise Exception
+            value = unique_values[counts.argmax()]
+            other_value = unique_values[counts.argmin()]
+            indices = np.where(np.array(c) == value)[0]
+
+            change_indices = np.random.choice(indices, int(max_count-balanced_count), replace=False)
+
+            for i in change_indices:
+                c[i] = other_value
+
     def random_chromossome(self):
         c = [x%2 for x in range(self.solution_size)]
+        random.shuffle(c)
 
         return c
     

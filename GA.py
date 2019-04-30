@@ -12,7 +12,7 @@ class Chromossome(object):
         return self.chromossome == other.chromossome
     
     def __str__(self):
-        return "%s, Fitness: %s" % (str(self.chromossome), str(self.fitness))
+        return "%s, Fitness: %s" % (str(self.chromossome[:10]), str(self.fitness))
     
     def size(self):
         return len(self.chromossome)
@@ -65,12 +65,14 @@ class GA(object):
         iteration = 0
         results = []
         while iteration < self.limit:
-            print('iter',iteration)
+            if iteration%100 == 0:
+                print('Gen:',iteration)
             #select parents
             parents = self.parent_selection.select_parents(self.population, self.parents_n, self.problem.best)
             #crossover and mutations
             children = self.crossover.crossover(parents)
             for c in children:
+
                 self.mutation.mutation(c, self.problem.random_gene)
                 
                 #fitness
@@ -80,9 +82,9 @@ class GA(object):
             #select new generation
             self.population = self.generation_selection.select_generation(self.population, children, self.pop_size)
             
-            print('PreviousBest', self.best_solution, self.__decode_solution(self.best_solution))
+            #print('PreviousBest', self.best_solution, self.__decode_solution(self.best_solution))
             self.check_best()
-            print('CurrentBest', self.best_solution, self.__decode_solution(self.best_solution))
+            #print('CurrentBest', self.best_solution, self.__decode_solution(self.best_solution))
             results.append(self.best_generation_solution.fitness)
             
             
@@ -97,13 +99,13 @@ class GA(object):
         if self.constraint != None:
             self.constraint.constraint(c, self.problem.precision)
             
-        try:
-            index = self.solutions.index(c)
-            return self.solutions[index].fitness
-        except ValueError:
-            #calculate children fitness
-            self.solutions.append(c)
-            return self.problem.calculate_fitness(c.chromossome)
+        # try:
+        #     index = self.solutions.index(c)
+        #     return self.solutions[index].fitness
+        # except ValueError:
+        #     #calculate children fitness
+        #     self.solutions.append(c)
+        return self.problem.calculate_fitness(c.chromossome)
     
     def __decode_solution(self, solution):
         result = None

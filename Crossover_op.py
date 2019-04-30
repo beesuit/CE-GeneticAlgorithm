@@ -5,6 +5,40 @@ class Crossover(object):
     
     def crossover(self, parents):
         raise NotImplementedError("The method hasn't been implemented yet.")
+
+class CountPreservingCrossover(Crossover):
+    
+    def crossover(self, parents):
+        children = []
+        for i in range(0, len(parents), 2):
+            parent1_c = parents[i].chromossome
+            parent2_c = parents[i+1].chromossome
+            child_c1 = parent1_c[:]
+            child_c2 = parent2_c[:]
+
+            l_up = []
+            l_down = []
+            
+            for i, (g1, g2) in enumerate(zip(parent1_c, parent2_c)):
+                if g1 == 1:
+                    if g1 != g2:
+                        l_up.append(i)
+                else:
+                    if g1 != g2:
+                        l_down.append(i)
+
+            for u, d in zip(l_up, l_down):
+                if random.random() < 0.5:
+                    child_c1[u], child_c2[u] = child_c2[u], child_c1[u]
+                    child_c1[d], child_c2[d] = child_c2[d], child_c1[d]
+            
+            child1 = Chromossome(child_c1)
+            child2 = Chromossome(child_c2)
+            
+            children.append(child1)
+            children.append(child2)
+
+        return children
         
 class ArithmeticCrossover(Crossover):
     
