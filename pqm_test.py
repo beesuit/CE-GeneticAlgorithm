@@ -13,7 +13,6 @@ import math
 import pickle
 import os
 import numpy as np
-import gdrive
 
 def pqm_class(param, train_class, test_class=None):
     train_X, train_y = util.load_dataset('SPECT.train', 1)
